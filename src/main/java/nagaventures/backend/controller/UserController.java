@@ -6,23 +6,27 @@ import nagaventures.backend.model.User;
 import nagaventures.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-@CrossOrigin(origins = "http://127.0.0.1:8080")
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:3000/")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> createUser(@RequestPart("user") String userJson, @RequestPart("imageFile") MultipartFile imageFile) {
+    public ResponseEntity<?> createUser(@RequestPart("user") String userJson,
+                                        @RequestPart("imageFile") MultipartFile imageFile) {
         try {
             // Parse the user JSON into a User object
             ObjectMapper mapper = new ObjectMapper();
@@ -30,6 +34,7 @@ public class UserController {
 
             // Call the service layer to save the user
             User createdUser = userService.createUser(user, imageFile);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
         } catch (Exception e) {
             Map<String, String> errorResponse = new HashMap<>();
@@ -51,5 +56,63 @@ public class UserController {
         return new ResponseEntity<>(new ApiResponse(HttpStatus.UNAUTHORIZED.value(), null, "Invalid credentials",
                 null), HttpStatus.UNAUTHORIZED);
     }
+
+    // Endpoint to get all users
+    @GetMapping("/users")
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        List<User> users = userService.findAllUsers();
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(new ApiResponse(HttpStatus.NO_CONTENT.value(),null, "No users found"),HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(new ApiResponse(HttpStatus.OK.value(),"Users retrieved successfully", users), HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ApiResponse> getUserDetails(@PathVariable Long id) {
+        try {
+            Optional<User> optionalUser = Optional.ofNullable(userService.findUserByUserId(id));
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+
+                // Construct a response DTO to exclude sensitive data
+                Map<String, Object> userResponse = new HashMap<>();
+                userResponse.put("userId", user.getUserId());
+                userResponse.put("firstName", user.getFirstName());
+                userResponse.put("middleName", user.getMiddleName());
+                userResponse.put("lastName", user.getLastName());
+                userResponse.put("age", user.getAge());
+                userResponse.put("birthdate", user.getBirthdate().toString());
+                userResponse.put("contactNo", user.getContactNo());
+                userResponse.put("gender", user.getGender());
+                userResponse.put("country", user.getCountry());
+                userResponse.put("province", user.getProvince());
+                userResponse.put("hometown", user.getHometown());
+                userResponse.put("brgy", user.getBrgy());
+                userResponse.put("email", user.getEmail());
+
+                return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "User retrieved successfully", userResponse));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new ApiResponse(HttpStatus.NOT_FOUND.value(), "User not found", null));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/user/profile/{id}")
+    public ResponseEntity<byte[]> getProfilePicture(@PathVariable Long id) {
+        Optional<User> optionalUser = Optional.ofNullable(userService.findUserByUserId(id));
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return ResponseEntity.ok()
+                    .contentType(MediaType.valueOf(user.getImageType()))
+                    .body(user.getImageData());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
+
 
 }

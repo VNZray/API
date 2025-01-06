@@ -1,5 +1,6 @@
 package nagaventures.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -10,19 +11,20 @@ import java.util.List;
 @Table(name = "user") // Specifies the table name in the database
 public class User {
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore  // Prevents recursive serialization of the Posts
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Share> shares = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL)
     private List<Friendship> sentRequests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
     private List<Friendship> receivedRequests = new ArrayList<>();
 
     @Id
@@ -43,16 +45,13 @@ public class User {
     @Column(name = "firstName", length = 40 , nullable = false)
     private String firstName;
 
-    @Column(name = "middleName", length = 1)
+    @Column(name = "middleName", length = 20)
     private String middleName;
 
     @Column(name = "lastName", nullable = false, length = 40)
     private String lastName;
 
-    @Column(name = "address", nullable = false)
-    private String address;
-
-    @Column(name = "birthday", nullable = false)
+    @Column(name = "birthdate", nullable = false)
     private Date birthdate;
 
     @Column(name = "age", nullable = false)
@@ -64,19 +63,22 @@ public class User {
     @Column(name = "email", unique = true, nullable = false, length = 70)
     private String email;
 
-    @Column(name = "bio", unique = true, length = 100)
+    @Column(name = "contactNo", unique = true, nullable = false, length = 11)
+    private String contactNo;
+
+    @Column(name = "bio", length = 100)
     private String bio;
 
-    @Column(name = "country", unique = true, length = 100)
+    @Column(name = "country", length = 100)
     private String country;
 
-    @Column(name = "province", unique = true, length = 100)
+    @Column(name = "province", length = 100)
     private String province;
 
-    @Column(name = "Hometown", unique = true, length = 100)
+    @Column(name = "Hometown", length = 100)
     private String Hometown;
 
-    @Column(name = "brgy", unique = true, length = 100)
+    @Column(name = "brgy", length = 100)
     private String brgy;
 
     @Column(name = "password", nullable = false)
@@ -85,7 +87,7 @@ public class User {
     public User() {
     }
 
-    public User(List<Post> posts, List<Comment> comments, List<Share> shares, List<Friendship> sentRequests, List<Friendship> receivedRequests, Long userId, String imageName, String imageType, byte[] imageData, String firstName, String middleName, String lastName, String address, Date birthdate, Integer age, String gender, String email, String bio, String country, String province, String hometown, String brgy, String password) {
+    public User(List<Post> posts, List<Comment> comments, List<Share> shares, List<Friendship> sentRequests, List<Friendship> receivedRequests, Long userId, String imageName, String imageType, byte[] imageData, String firstName, String middleName, String lastName, Date birthdate, Integer age, String gender, String email, String contactNo, String bio, String country, String province, String hometown, String brgy, String password) {
         this.posts = posts;
         this.comments = comments;
         this.shares = shares;
@@ -98,11 +100,11 @@ public class User {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
-        this.address = address;
         this.birthdate = birthdate;
         this.age = age;
         this.gender = gender;
         this.email = email;
+        this.contactNo = contactNo;
         this.bio = bio;
         this.country = country;
         this.province = province;
@@ -207,14 +209,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public Date getBirthdate() {
         return birthdate;
     }
@@ -293,5 +287,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getContactNo() {
+        return contactNo;
+    }
+
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 }

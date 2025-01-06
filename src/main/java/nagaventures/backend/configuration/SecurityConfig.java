@@ -1,4 +1,4 @@
-package com.example.userprofile;
+package nagaventures.backend.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

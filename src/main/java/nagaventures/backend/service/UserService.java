@@ -1,6 +1,8 @@
 package nagaventures.backend.service;
 
+import nagaventures.backend.model.Post;
 import nagaventures.backend.model.User;
+import nagaventures.backend.repository.PostRepository;
 import nagaventures.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,9 +25,14 @@ public class UserService {
         // Encrypt the password before saving
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        user.setImageName(imageFile.getOriginalFilename());
-        user.setImageType(imageFile.getContentType());
-        user.setImageData(imageFile.getBytes());
+        // Handling the file
+        if (imageFile != null && !imageFile.isEmpty()) {
+            user.setImageName(imageFile.getOriginalFilename());
+            user.setImageType(imageFile.getContentType());
+            user.setImageData(imageFile.getBytes());
+        }
+
+        // Save the user entity to the database
         return userRepository.save(user);
     }
 
