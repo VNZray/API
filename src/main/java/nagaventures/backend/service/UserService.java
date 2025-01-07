@@ -71,4 +71,44 @@ public class UserService {
         return user;
     }
 
+    public User updateUserInfo(Long userId, User updatedUser) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+
+        User existingUser = optionalUser.get();
+        // Update fields
+        existingUser.setFirstName(updatedUser.getFirstName());
+        existingUser.setMiddleName(updatedUser.getMiddleName());
+        existingUser.setLastName(updatedUser.getLastName());
+        existingUser.setGender(updatedUser.getGender());
+        existingUser.setEmail(updatedUser.getEmail());
+        existingUser.setContactNo(updatedUser.getContactNo());
+        existingUser.setBirthdate(updatedUser.getBirthdate());
+        existingUser.setAge(updatedUser.getAge());
+        existingUser.setCountry(updatedUser.getCountry());
+        existingUser.setProvince(updatedUser.getProvince());
+        existingUser.setHometown(updatedUser.getHometown());
+        existingUser.setBrgy(updatedUser.getBrgy());
+        existingUser.setBio(updatedUser.getBio());
+        existingUser.setPassword(updatedUser.getPassword());
+
+        // Update the password only if it has changed
+        if (!passwordEncoder.matches(updatedUser.getPassword(), existingUser.getPassword())) {
+            existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+        }
+
+        return userRepository.save(existingUser);
+    }
+
+    public boolean deleteUserById(Long id) {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isPresent()) {
+            userRepository.delete(optionalUser.get());
+            return true;
+        }
+        return false;
+    }
+
 }

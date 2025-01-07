@@ -35,4 +35,16 @@ public class PostService {
         return post.orElse(null); // Return null if user not found
     }
 
+    public Post updateReactionCounter(Long id, Integer reactionCount) throws Exception {
+        Optional<Post> postOptional = postRepository.findById(id);
+
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            post.setReactionCount(reactionCount); // Update only the reactionCounter
+            return postRepository.save(post);        // Save changes to the database
+        } else {
+            throw new Exception("Post with ID " + id + " not found.");
+        }
+    }
+
 }

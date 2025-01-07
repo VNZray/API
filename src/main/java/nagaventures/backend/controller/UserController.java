@@ -2,6 +2,7 @@ package nagaventures.backend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nagaventures.backend.model.ApiResponse;
+import nagaventures.backend.model.Post;
 import nagaventures.backend.model.User;
 import nagaventures.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +90,8 @@ public class UserController {
                 userResponse.put("hometown", user.getHometown());
                 userResponse.put("brgy", user.getBrgy());
                 userResponse.put("email", user.getEmail());
+                userResponse.put("bio", user.getBio());
+                userResponse.put("password", user.getPassword());
 
                 return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "User retrieved successfully", userResponse));
             } else {
@@ -114,5 +117,41 @@ public class UserController {
         }
     }
 
+    @PutMapping(value = "/user/{id}")
+    public ResponseEntity<?> updateUserInfo(
+            @PathVariable Long id,
+            @RequestBody User updatedUser) {
+        try {
+            User user = userService.updateUserInfo(id, updatedUser);
+            return ResponseEntity.ok(user);
+        } catch (RuntimeException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/user/{id}")
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable Long id) {
+        try {
+            boolean isDeleted = userService.deleteUserById(id);
+
+            if (isDeleted) {
+                return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "User deleted successfully", null));
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new ApiResponse(HttpStatus.NOT_FOUND.value(), "User not found", null));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred", e.getMessage()));
+        }
+    }
 
 }

@@ -25,12 +25,6 @@ public class Share {
     public Share() {
     }
 
-    public Share(User user, Post post, String sharedAt) {
-        this.user = user;
-        this.post = post;
-        this.sharedAt = sharedAt;
-    }
-
     public Long getShareId() {
         return shareId;
     }

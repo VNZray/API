@@ -1,5 +1,6 @@
 package nagaventures.backend.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nagaventures.backend.model.Post;
 import nagaventures.backend.model.User;
@@ -77,5 +78,29 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
     }
+
+
+    @PutMapping(value = "/post/react/{id}")
+    public ResponseEntity<?> updateReactionCounter(
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> requestBody) {
+        try {
+            Integer reactionCount = requestBody.get("reactionCount");
+            if (reactionCount == null) {
+                throw new IllegalArgumentException("reactionCount is required.");
+            }
+
+            Post updatedPost = postService.updateReactionCounter(id, reactionCount);
+
+            return ResponseEntity.ok(updatedPost);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+
 
 }

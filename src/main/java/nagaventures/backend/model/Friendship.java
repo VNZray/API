@@ -31,13 +31,6 @@ public class Friendship {
     public Friendship() {
     }
 
-    public Friendship(User requester, User receiver, String status, String createdAt) {
-        this.requester = requester;
-        this.receiver = receiver;
-        this.status = status;
-        this.createdAt = createdAt;
-    }
-
     public Long getFriendshipId() {
         return friendshipId;
     }

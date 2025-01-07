@@ -10,10 +10,13 @@ import java.util.List;
 @Table(name = "post")
 public class Post {
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reaction> reactions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Share> shares = new ArrayList<>();
 
     @ManyToOne

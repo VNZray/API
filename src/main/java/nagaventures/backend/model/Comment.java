@@ -2,9 +2,15 @@ package nagaventures.backend.model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "comment") // Specifies the table name in the database
 public class Comment {
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reaction> reactions = new ArrayList<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,15 +35,6 @@ public class Comment {
     private String updatedAt;
 
     public Comment() {
-    }
-
-    public Comment(Long commentId, String comment, Post post, User user, String createdAt, String updatedAt) {
-        this.commentId = commentId;
-        this.comment = comment;
-        this.post = post;
-        this.user = user;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public Long getCommentId() {
@@ -86,5 +83,13 @@ public class Comment {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Reaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<Reaction> reactions) {
+        this.reactions = reactions;
     }
 }

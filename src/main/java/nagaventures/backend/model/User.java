@@ -11,20 +11,20 @@ import java.util.List;
 @Table(name = "user") // Specifies the table name in the database
 public class User {
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore  // Prevents recursive serialization of the Posts
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Share> shares = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Friendship> sentRequests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Friendship> receivedRequests = new ArrayList<>();
 
     @Id
@@ -85,32 +85,6 @@ public class User {
     private String password;
 
     public User() {
-    }
-
-    public User(List<Post> posts, List<Comment> comments, List<Share> shares, List<Friendship> sentRequests, List<Friendship> receivedRequests, Long userId, String imageName, String imageType, byte[] imageData, String firstName, String middleName, String lastName, Date birthdate, Integer age, String gender, String email, String contactNo, String bio, String country, String province, String hometown, String brgy, String password) {
-        this.posts = posts;
-        this.comments = comments;
-        this.shares = shares;
-        this.sentRequests = sentRequests;
-        this.receivedRequests = receivedRequests;
-        this.userId = userId;
-        this.imageName = imageName;
-        this.imageType = imageType;
-        this.imageData = imageData;
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.birthdate = birthdate;
-        this.age = age;
-        this.gender = gender;
-        this.email = email;
-        this.contactNo = contactNo;
-        this.bio = bio;
-        this.country = country;
-        this.province = province;
-        Hometown = hometown;
-        this.brgy = brgy;
-        this.password = password;
     }
 
     public List<Post> getPosts() {
