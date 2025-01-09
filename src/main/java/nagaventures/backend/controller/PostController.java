@@ -2,6 +2,7 @@ package nagaventures.backend.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import nagaventures.backend.model.ApiResponse;
 import nagaventures.backend.model.Post;
 import nagaventures.backend.model.User;
 import nagaventures.backend.repository.PostRepository;
@@ -14,14 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:3000/")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"})
 public class PostController {
 
     private final PostService postService;
@@ -54,31 +52,46 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<?> getAllPosts() {
+    public ResponseEntity<ApiResponse> getAllPosts() {
         try {
-            List<Post> posts = postRepository.findAll();
-            return ResponseEntity.ok(posts);
+            // Retrieve all posts
+            List<Post> posts = postService.findAllPosts();
+
+            if (posts.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                        new ApiResponse(HttpStatus.NOT_FOUND.value(), "No Posts found", null));
+            }
+
+            // Prepare the response for all posts
+            List<Map<String, Object>> postData = new ArrayList<>();
+
+            for (Post post : posts) {
+                // Construct posts details (excluding sensitive data)
+                Map<String, Object> postResponse = new HashMap<>();
+                postResponse.put("postId", post.getPostId());
+                postResponse.put("caption", post.getCaption());
+                postResponse.put("users", post.getUser());
+                postResponse.put("postedAt", post.getCreatedAt());
+                postResponse.put("shareCount", post.getShareCount());
+                postResponse.put("commmentCount", post.getCommentCount());
+
+                // Add post image picture (if available)
+                if (post.getImageData() != null && post.getImageType() != null) {
+                    String image = "data:" + post.getImageType() + ";base64," + Base64.getEncoder().encodeToString(post.getImageData());
+                    postResponse.put("postImage", image);
+                } else {
+                    postResponse.put("postImage", null);
+                }
+                // Add the post data to the list
+                postData.add(postResponse);
+            }
+
+            return ResponseEntity.ok(new ApiResponse(HttpStatus.OK.value(), "Posts retrieved successfully", postData));
         } catch (Exception e) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "An error occurred.");
-            errorResponse.put("message", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "An error occurred", e.getMessage()));
         }
     }
-
-    @GetMapping("/posts/{id}/image")
-    public ResponseEntity<byte[]> getPostImage(@PathVariable Long id) {
-        Optional<Post> optionalUser = Optional.ofNullable(postService.findPostsById(id));
-        if (optionalUser.isPresent()) {
-            Post post = optionalUser.get();
-            return ResponseEntity.ok()
-                    .contentType(MediaType.valueOf(post.getImageType()))
-                    .body(post.getImageData());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-    }
-
 
     @PutMapping(value = "/post/react/{id}")
     public ResponseEntity<?> updateReactionCounter(
@@ -100,7 +113,4 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
-
-
-
 }

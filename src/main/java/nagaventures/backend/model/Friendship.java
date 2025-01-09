@@ -1,9 +1,13 @@
 package nagaventures.backend.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "friendship")
+@Table(name = "Friendship")
 public class Friendship {
 
     @Id
@@ -12,21 +16,28 @@ public class Friendship {
     private Long friendshipId;
 
     @ManyToOne
-    @JoinColumn(name = "requesterId", nullable = false) // User who sent the request
+    @JoinColumn(name = "requesterId", nullable = false)
     private User requester;
 
     @ManyToOne
-    @JoinColumn(name = "receiverId", nullable = false) // User who received the request
+    @JoinColumn(name = "receiverId", nullable = false)
     private User receiver;
 
-    @Column(name = "status", nullable = false) // e.g., "pending", "accepted", "rejected"
-    private String status;
+    public enum FriendshipStatus {
+        PENDING, ACCEPTED, REJECTED
+    }
 
-    @Column(name = "createdAt", nullable = false)
-    private String createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private FriendshipStatus status;
 
+    @CreationTimestamp
+    @Column(name = "createdAt", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
     @Column(name = "updatedAt")
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
     public Friendship() {
     }
@@ -55,28 +66,39 @@ public class Friendship {
         this.receiver = receiver;
     }
 
-    public String getStatus() {
+    public FriendshipStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(FriendshipStatus status) {
         this.status = status;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
+    public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
 
-    public String getUpdatedAt() {
+    public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(String updatedAt) {
+    public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-}
 
+    @Override
+    public String toString() {
+        return "Friendship{" +
+                "friendshipId=" + friendshipId +
+                ", requester=" + requester +
+                ", receiver=" + receiver +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+}

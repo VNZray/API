@@ -15,15 +15,15 @@ public class User {
     @JsonIgnore  // Prevents recursive serialization of the Posts
     private List<Post> posts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Share> shares = new ArrayList<>();
 
+    @JsonIgnore  // Prevents recursive serialization of the Posts
     @OneToMany(mappedBy = "requester", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Friendship> sentRequests = new ArrayList<>();
 
+    @JsonIgnore  // Prevents recursive serialization of the Posts
     @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Friendship> receivedRequests = new ArrayList<>();
 
@@ -39,7 +39,7 @@ public class User {
     private String imageType;
 
     @Lob
-    @Column(name = "imageData")
+    @Column(name = "imageData", columnDefinition = "LONGBLOB")
     private byte[] imageData;
 
     @Column(name = "firstName", length = 40 , nullable = false)
@@ -54,7 +54,7 @@ public class User {
     @Column(name = "birthdate", nullable = false)
     private Date birthdate;
 
-    @Column(name = "age", nullable = false)
+    @Column(name = "age")
     private Integer age;
 
     @Column(name = "gender", nullable = false, length = 6)
@@ -69,16 +69,16 @@ public class User {
     @Column(name = "bio", length = 100)
     private String bio;
 
-    @Column(name = "country", length = 100)
+    @Column(name = "country", nullable = false, length = 100)
     private String country;
 
-    @Column(name = "province", length = 100)
+    @Column(name = "province", nullable = false, length = 100)
     private String province;
 
-    @Column(name = "Hometown", length = 100)
+    @Column(name = "Hometown", nullable = false, length = 100)
     private String Hometown;
 
-    @Column(name = "brgy", length = 100)
+    @Column(name = "brgy", nullable = false, length = 100)
     private String brgy;
 
     @Column(name = "password", nullable = false)
@@ -93,14 +93,6 @@ public class User {
 
     public void setPosts(List<Post> posts) {
         this.posts = posts;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
     }
 
     public List<Share> getShares() {

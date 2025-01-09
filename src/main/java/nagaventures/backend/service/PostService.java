@@ -1,6 +1,7 @@
 package nagaventures.backend.service;
 
 import nagaventures.backend.model.Post;
+import nagaventures.backend.model.User;
 import nagaventures.backend.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,11 @@ public class PostService {
         }
         // Save the user entity to the database
         return postRepository.save(post);
+    }
+
+    // Fetch all users
+    public List<Post> findAllPosts() {
+        return postRepository.findAll();
     }
 
     // Fetch post by ID

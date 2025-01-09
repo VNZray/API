@@ -11,12 +11,6 @@ import java.util.List;
 public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reaction> reactions = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Share> shares = new ArrayList<>();
 
     @ManyToOne
@@ -35,7 +29,7 @@ public class Post {
     private String imageType;
 
     @Lob
-    @Column(name = "imageData")
+    @Column(name = "imageData", columnDefinition = "LONGBLOB")
     private byte[] imageData;
 
     @Column(name = "reactionCount")
@@ -60,31 +54,6 @@ public class Post {
     private String updatedAt;
 
     public Post() {
-    }
-
-    public Post(List<Comment> comments, List<Share> shares, User user, Long postId, String imageName, String imageType, byte[] imageData, Integer reactionCount, Integer commentCount, Integer shareCount, String caption, Long commendId, String createdAt, String updatedAt) {
-        this.comments = comments;
-        this.shares = shares;
-        this.user = user;
-        this.postId = postId;
-        this.imageName = imageName;
-        this.imageType = imageType;
-        this.imageData = imageData;
-        this.reactionCount = reactionCount;
-        this.commentCount = commentCount;
-        this.shareCount = shareCount;
-        this.caption = caption;
-        this.commendId = commendId;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
     }
 
     public List<Share> getShares() {

@@ -1,6 +1,9 @@
 package nagaventures.backend.model;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "share")
@@ -19,8 +22,9 @@ public class Share {
     @JoinColumn(name = "postId", nullable = false) // Foreign key to Post
     private Post post;
 
-    @Column(name = "sharedAt")
-    private String sharedAt;
+    @CreationTimestamp
+    @Column(name = "sharedAt", updatable = false)
+    private LocalDateTime sharedAt;
 
     public Share() {
     }
@@ -49,11 +53,11 @@ public class Share {
         this.post = post;
     }
 
-    public String getSharedAt() {
+    public LocalDateTime getSharedAt() {
         return sharedAt;
     }
 
-    public void setSharedAt(String sharedAt) {
+    public void setSharedAt(LocalDateTime sharedAt) {
         this.sharedAt = sharedAt;
     }
 }
