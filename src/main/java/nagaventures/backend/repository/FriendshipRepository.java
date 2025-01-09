@@ -19,6 +19,9 @@ public interface FriendshipRepository extends JpaRepository<Friendship, Long> {
     // Optional: Fetch a specific friendship between requester and receiver
     Optional<Friendship> findByRequester_UserIdAndReceiver_UserId(Long requesterId, Long receiverId);
 
+    Optional<Friendship> findByFriendshipId(Long friendshipId);
+
     Optional<Friendship> findByReceiver_UserId(Long receiverId);
+
 
 }

@@ -96,4 +96,17 @@ public class FriendshipService {
             return false; // No friend request found
         }
     }
+
+    public Friendship acceptFriendRequest(long friendshipId) {
+        Optional<Friendship> optional = friendshipRepository.findByFriendshipId(friendshipId);
+        if (optional.isEmpty()) {
+            throw new RuntimeException("F not found");
+        }
+
+        Friendship friendship = optional.get();
+        // Update fields
+        friendship.setStatus(Friendship.FriendshipStatus.valueOf("ACCEPTED"));
+
+        return friendshipRepository.save(friendship);
+    }
 }

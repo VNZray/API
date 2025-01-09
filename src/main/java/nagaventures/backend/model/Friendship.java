@@ -7,8 +7,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Friendship")
-public class Friendship {
+@Table(
+        name = "Friendship",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"requesterId", "receiverId"})
+)public class Friendship {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

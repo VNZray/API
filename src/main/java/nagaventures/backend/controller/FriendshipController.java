@@ -2,6 +2,7 @@ package nagaventures.backend.controller;
 
 import nagaventures.backend.dto.FriendshipDTO;
 import nagaventures.backend.model.Friendship;
+import nagaventures.backend.model.User;
 import nagaventures.backend.repository.FriendshipRepository;
 import nagaventures.backend.service.FriendshipService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -51,7 +50,17 @@ public class FriendshipController {
         return ResponseEntity.ok(friendRequestsDTO);
     }
 
+    @GetMapping("/friendship/friends/{receiverId}")
+    public ResponseEntity<List<FriendshipDTO>> getFriendList(@PathVariable Long receiverId) {
+        List<Friendship> friendRequests = friendshipRepository.findByReceiver_UserIdAndStatus(receiverId, Friendship.FriendshipStatus.ACCEPTED);
 
+        // Convert each Friendship object to a FriendshipDTO
+        List<FriendshipDTO> friendRequestsDTO = friendRequests.stream()
+                .map(friendshipService::convertToDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(friendRequestsDTO);
+    }
 
     @GetMapping("/friendship/status/full/{requesterId}/{receiverId}")
     public ResponseEntity<Map<String, String>> getFriendshipStatus(
@@ -75,6 +84,50 @@ public class FriendshipController {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred");
+        }
+    }
+
+    // Endpoint to remove (delete) a friend
+    @DeleteMapping("/friendship/remove/{friendshipId}")
+    public ResponseEntity<String> removeFriend(@PathVariable Long friendshipId) {
+        try {
+            // Check if the friendship record exists
+            Optional<Friendship> friendship = friendshipRepository.findById(friendshipId);
+            if (friendship.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Friendship record not found");
+            }
+
+            // Remove the friendship record
+            friendshipRepository.deleteById(friendshipId);
+
+            // Return a success response
+            return ResponseEntity.ok("Friendship removed successfully");
+        } catch (Exception e) {
+            // Log the error and return a server error response
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while removing the friendship");
+        }
+    }
+
+
+    @PutMapping(value = "/friendship/accept/{friendshipId}")
+    public ResponseEntity<?> updateUserInfo(
+            @PathVariable Long friendshipId) {
+        try {
+            Friendship friendship = friendshipService.acceptFriendRequest(friendshipId);
+            return ResponseEntity.ok(friendship);
+        } catch (RuntimeException e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "An error occurred.");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
 }
